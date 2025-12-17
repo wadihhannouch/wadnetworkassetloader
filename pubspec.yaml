@@ -1,5 +1,5 @@
 name: wadnetworkassetloader
-description: "A new Flutter package project."
+description: A Flutter package that provides a network-based asset loader for easy_localization with smart fallback and caching capabilities.
 version: 0.0.1
 homepage: https://github.com/wadihhannouch/wadnetworkassetloader
 
