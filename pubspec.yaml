@@ -1,6 +1,6 @@
 name: wadnetworkassetloader
 description: A Flutter package that provides a network-based asset loader for easy_localization with smart fallback and caching capabilities.
-version: 0.0.1
+version: 0.0.2
 homepage: https://github.com/wadihhannouch/wadnetworkassetloader
 
 environment:
@@ -10,10 +10,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  path_provider: ^2.1.3
-  easy_localization: ^3.0.7
-  connectivity_plus: ^6.0.5
-  http: ^1.1.0
+  path_provider: ^2.1.5
+  easy_localization: ^3.0.8
+  connectivity_plus: ^7.0.0
+  http: ^1.6.0
 
 dev_dependencies:
   flutter_test:

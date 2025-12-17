@@ -1,4 +1,4 @@
-# WadNetworkAssetLoader
+# EasyNetworkAssetLoader
 
 A Flutter package that provides a network-based asset loader for easy_localization with smart fallback and caching capabilities.
 
@@ -49,7 +49,7 @@ void main() async {
       supportedLocales: [Locale('en'), Locale('ar'), Locale('fr')],
       path: 'assets/translations',
       fallbackLocale: Locale('en'),
-      assetLoader: WadNetworkAssetLoader(
+      assetLoader: EasyNetworkAssetLoader(
         localeUrl: (localeName) => 'https://yourdomain.com/translations/',
         assetsPath: 'assets/translations',
         timeout: Duration(seconds: 30),
