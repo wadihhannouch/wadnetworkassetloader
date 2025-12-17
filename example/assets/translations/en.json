@@ -1,0 +1,7 @@
+{
+  "app_title": "Network Asset Loader",
+  "welcome_message": "Welcome to WadNetworkAssetLoader",
+  "description": "This example demonstrates how to use network-based translations with automatic fallback and caching.",
+  "select_language": "Select Language",
+  "info_message": "The app will first try to load translations from the network, then fall back to local cache or bundled assets if needed."
+}

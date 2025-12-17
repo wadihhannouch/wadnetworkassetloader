@@ -1,0 +1,7 @@
+{
+  "app_title": "Chargeur d'actifs réseau",
+  "welcome_message": "Bienvenue sur WadNetworkAssetLoader",
+  "description": "Cet exemple montre comment utiliser des traductions basées sur le réseau avec secours automatique et mise en cache.",
+  "select_language": "Sélectionner la langue",
+  "info_message": "L'application essaiera d'abord de charger les traductions depuis le réseau, puis reviendra au cache local ou aux ressources intégrées si nécessaire."
+}

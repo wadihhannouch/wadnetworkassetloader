@@ -1,0 +1,20 @@
+name: wadnetworkassetloader_example
+description: Example app demonstrating how to use wadnetworkassetloader package
+version: 1.0.0
+publish_to: 'none'
+
+environment:
+  sdk: ^3.10.3
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  wadnetworkassetloader:
+    path: ../
+  easy_localization: ^3.0.7
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/translations/
