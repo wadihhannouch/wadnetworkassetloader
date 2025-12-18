@@ -1,6 +1,6 @@
-# EasyNetworkAssetLoader Example
+# NetworkOrAssetLoader Example
 
-This example demonstrates how to use the `wadnetworkassetloader` package with `easy_localization` to load translations from a network source with automatic fallback and caching.
+This example demonstrates how to use the `network_or_asset_loader` package with `easy_localization` to load translations from a network source with automatic fallback and caching.
 
 ## Features Demonstrated
 

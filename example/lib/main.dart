@@ -11,7 +11,7 @@ void main() async {
       supportedLocales: [Locale('en'), Locale('ar'), Locale('fr')],
       path: 'assets/translations',
       fallbackLocale: Locale('en'),
-      assetLoader: EasyNetworkAssetLoader(
+      assetLoader: NetworkOrAssetLoader(
         // Replace with your actual server URL
         localeUrl: (localeName) => 'https://yourdomain.com/translations/',
         assetsPath: 'assets/translations',
@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'EasyNetworkAssetLoader Example',
+      title: 'NetworkOrAssetLoader Example',
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,
       locale: context.locale,

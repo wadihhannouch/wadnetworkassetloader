@@ -1,6 +1,6 @@
 /// A network-based asset loader for easy_localization with smart fallback and caching.
 ///
-/// This library provides [EasyNetworkAssetLoader], an implementation of [AssetLoader]
+/// This library provides [NetworkOrAssetLoader], an implementation of [AssetLoader]
 /// that loads translation files from a remote server with automatic fallback to local
 /// cache and bundled assets when the network is unavailable.
 library wadnetworkassetloader;
@@ -23,7 +23,7 @@ import 'package:path_provider/path_provider.dart' as paths;
 /// Example usage:
 /// ```dart
 /// EasyLocalization(
-///   assetLoader: EasyNetworkAssetLoader(
+///   assetLoader: NetworkOrAssetLoader(
 ///     localeUrl: (localeName) => 'https://yourdomain.com/translations/',
 ///     assetsPath: 'assets/translations',
 ///     timeout: Duration(seconds: 30),
@@ -32,7 +32,7 @@ import 'package:path_provider/path_provider.dart' as paths;
 ///   // ... other properties
 /// )
 /// ```
-class EasyNetworkAssetLoader extends AssetLoader {
+class NetworkOrAssetLoader extends AssetLoader {
   /// A function that returns the base URL for loading translation files.
   ///
   /// The function receives the locale name (e.g., 'en', 'ar', 'fr') and should
@@ -70,14 +70,14 @@ class EasyNetworkAssetLoader extends AssetLoader {
   /// Defaults to 1 day.
   final Duration localCacheDuration;
 
-  /// Creates a new [EasyNetworkAssetLoader].
+  /// Creates a new [NetworkOrAssetLoader].
   ///
   /// The [localeUrl] and [assetsPath] parameters are required.
   ///
   /// The [timeout] parameter defaults to 30 seconds.
   ///
   /// The [localCacheDuration] parameter defaults to 1 day.
-  EasyNetworkAssetLoader({
+  NetworkOrAssetLoader({
     required this.localeUrl,
     this.timeout = const Duration(seconds: 30),
     required this.assetsPath,
