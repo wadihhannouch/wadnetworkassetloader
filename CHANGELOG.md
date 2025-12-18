@@ -1,3 +1,8 @@
+## 0.0.5
+
+* Updated GitHub Actions workflow to use latest stable Flutter version
+* Fixed workflow compatibility issues
+
 ## 0.0.4
 
 * Fixed library file naming to use underscores (network_or_asset_loader.dart)
