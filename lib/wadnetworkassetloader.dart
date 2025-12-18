@@ -213,6 +213,7 @@ class NetworkOrAssetLoader extends AssetLoader {
   Future<void> saveTranslation(String localeName, String content) async {
     var file = File(await getFilenameForLocale(localeName));
     await file.create(recursive: true);
+    return print('saved');
   }
 
   /// Returns the local path where cached translations are stored.
