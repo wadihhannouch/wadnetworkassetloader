@@ -26,8 +26,7 @@ jobs:
         run: flutter pub publish --dry-run
 
       - name: Publish to pub.dev
-        uses: k-paxian/dart-package-publisher@v1.6
-        with:
-          credentialJson: ${{ secrets.PUB_DEV_CREDENTIALS }}
-          flutter: true
-          skipTests: false
+        run: |
+          flutter pub publish --force
+        env:
+          PUB_TOKEN: ${{ secrets.PUB_TOKEN }}
