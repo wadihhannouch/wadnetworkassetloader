@@ -1,3 +1,7 @@
+## 0.0.6
+
+* Minor updates and improvements
+
 ## 0.0.5
 
 * Updated GitHub Actions workflow to use latest stable Flutter version
