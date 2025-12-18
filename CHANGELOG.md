@@ -1,7 +1,14 @@
+## 0.0.4
+
+* Fixed library file naming to use underscores (network_or_asset_loader.dart)
+* Updated all import statements to use correct package and file names
+* Added GitHub Actions workflow for automated publishing
+* Minor documentation improvements
+
 ## 0.0.3
 
 * **Breaking Change**: Renamed class from `EasyNetworkAssetLoader` to `NetworkOrAssetLoader`
-* **Breaking Change**: Package name changed from `wadnetworkassetloader` to `network_or_asset_loader`
+* **Breaking Change**: Package name changed from `network-or-asset-loader` to `network_or_asset_loader`
 * Improved naming clarity and consistency
 
 ## 0.0.2
