@@ -3,7 +3,7 @@
 /// This library provides [NetworkOrAssetLoader], an implementation of [AssetLoader]
 /// that loads translation files from a remote server with automatic fallback to local
 /// cache and bundled assets when the network is unavailable.
-library wadnetworkassetloader;
+library network_or_asset_loader;
 
 import 'dart:convert';
 import 'dart:io';

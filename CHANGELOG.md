@@ -1,7 +1,8 @@
 ## 0.0.3
 
 * **Breaking Change**: Renamed class from `EasyNetworkAssetLoader` to `NetworkOrAssetLoader`
-* Improved naming clarity for the loader class
+* **Breaking Change**: Package name changed from `wadnetworkassetloader` to `network_or_asset_loader`
+* Improved naming clarity and consistency
 
 ## 0.0.2
 

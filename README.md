@@ -17,7 +17,7 @@ Add the package to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  wadnetworkassetloader: ^0.0.1
+  network_or_asset_loader: ^0.0.3
   easy_localization: ^3.0.7
 ```
 
@@ -38,7 +38,7 @@ Basic implementation with `easy_localization`:
 ```dart
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:wadnetworkassetloader/wadnetworkassetloader.dart';
+import 'package:network_or_asset_loader/wadnetworkassetloader.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

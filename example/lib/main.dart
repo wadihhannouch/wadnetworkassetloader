@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:wadnetworkassetloader/wadnetworkassetloader.dart';
+import 'package:network_or_asset_loader/network-or-asset-loader.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
