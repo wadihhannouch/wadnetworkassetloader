@@ -1,6 +1,6 @@
 name: network_or_asset_loader
 description: A Flutter package that provides a network-based asset loader for easy_localization with smart fallback and caching capabilities.
-version: 0.0.6
+version: 0.0.7
 homepage: https://github.com/wadihhannouch/wadnetworkassetloader
 
 environment:
