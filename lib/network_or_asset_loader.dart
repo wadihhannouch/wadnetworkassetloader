@@ -3,7 +3,7 @@
 /// This library provides [NetworkOrAssetLoader], an implementation of [AssetLoader]
 /// that loads translation files from a remote server with automatic fallback to local
 /// cache and bundled assets when the network is unavailable.
-library network_or_asset_loader;
+library;
 
 import 'dart:convert';
 import 'dart:io';
@@ -148,7 +148,6 @@ class NetworkOrAssetLoader extends AssetLoader {
   /// Returns an empty string if the download fails or times out.
   Future<String> loadFromNetwork(String localeName) async {
     String url = localeUrl(localeName);
-    url = "$url$localeName";
     try {
       final response = await Future.any([
         http.get(Uri.parse(url)),
