@@ -1,3 +1,15 @@
+## 0.0.8
+
+* **Bug Fix**: `saveTranslation` now writes content to the file (caching was previously non-functional)
+* **Bug Fix**: Fixed inverted cache duration logic in `localTranslationExists` — renamed `ignoreCacheDuration` to `checkCacheDuration` for clarity
+* **Bug Fix**: Fixed timeout race condition — replaced `Future.any` with proper `.timeout()` to avoid leaked HTTP requests
+* **Improvement**: Cache is now stored in `getApplicationSupportDirectory()` instead of `getTemporaryDirectory()` for reliable persistence
+* **Improvement**: `localeUrl` is now strongly typed as `String Function(String)` instead of `Function`
+* **Feature**: Added `httpClient` parameter — inject a custom `http.Client` for auth headers, interceptors, or testing
+* **Feature**: Added `forceRefresh` parameter — bypass cache and always fetch from the network
+* **Feature**: Added `onSourceResolved` callback — get notified which source translations were loaded from (cache, network, expiredCache, or asset)
+* **Feature**: Added `TranslationSource` enum for source tracking
+
 ## 0.0.6
 
 * Minor updates and improvements

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:network_or_asset_loader/network_or_asset_loader.dart';
@@ -13,10 +14,14 @@ void main() async {
       fallbackLocale: Locale('en'),
       assetLoader: NetworkOrAssetLoader(
         // Replace with your actual server URL
-        localeUrl: (localeName) => 'https://yourdomain.com/translations/',
+        localeUrl: (String localeName) =>
+            'https://yourdomain.com/translations/$localeName.json',
         assetsPath: 'assets/translations',
         timeout: Duration(seconds: 30),
         localCacheDuration: Duration(days: 1),
+        onSourceResolved: (locale, source) {
+          debugPrint('Locale "$locale" loaded from: $source');
+        },
       ),
       child: MyApp(),
     ),

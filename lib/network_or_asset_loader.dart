@@ -5,6 +5,7 @@
 /// cache and bundled assets when the network is unavailable.
 library;
 
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
@@ -15,6 +16,21 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart' as paths;
 
+/// The source from which translations were loaded.
+enum TranslationSource {
+  /// Translations loaded from a valid (non-expired) local cache.
+  cache,
+
+  /// Translations downloaded from the network.
+  network,
+
+  /// Translations loaded from an expired local cache as a fallback.
+  expiredCache,
+
+  /// Translations loaded from bundled app assets.
+  asset,
+}
+
 /// A network-based asset loader for easy_localization with smart caching and fallback.
 ///
 /// This loader attempts to load translation files from a remote server first, then
@@ -24,26 +40,28 @@ import 'package:path_provider/path_provider.dart' as paths;
 /// ```dart
 /// EasyLocalization(
 ///   assetLoader: NetworkOrAssetLoader(
-///     localeUrl: (localeName) => 'https://yourdomain.com/translations/',
+///     localeUrl: (localeName) => 'https://yourdomain.com/translations/$localeName.json',
 ///     assetsPath: 'assets/translations',
 ///     timeout: Duration(seconds: 30),
 ///     localCacheDuration: Duration(days: 1),
+///     onSourceResolved: (locale, source) {
+///       debugPrint('Locale $locale loaded from $source');
+///     },
 ///   ),
 ///   // ... other properties
 /// )
 /// ```
 class NetworkOrAssetLoader extends AssetLoader {
-  /// A function that returns the base URL for loading translation files.
+  /// A function that returns the full URL for a translation file.
   ///
   /// The function receives the locale name (e.g., 'en', 'ar', 'fr') and should
-  /// return the base URL. The locale name will be appended to construct the full URL.
+  /// return the complete URL to the JSON translation file.
   ///
   /// Example:
   /// ```dart
-  /// localeUrl: (localeName) => 'https://example.com/translations/'
-  /// // Results in: https://example.com/translations/en.json
+  /// localeUrl: (localeName) => 'https://example.com/translations/$localeName.json'
   /// ```
-  final Function localeUrl;
+  final String Function(String localeName) localeUrl;
 
   /// The maximum time to wait for a network request to complete.
   ///
@@ -70,6 +88,28 @@ class NetworkOrAssetLoader extends AssetLoader {
   /// Defaults to 1 day.
   final Duration localCacheDuration;
 
+  /// An optional HTTP client for making network requests.
+  ///
+  /// If not provided, a default [http.Client] is created for each request.
+  /// Pass a custom client to add interceptors, auth headers, or custom
+  /// certificates, and to facilitate testing.
+  final http.Client? httpClient;
+
+  /// Whether to bypass the cache and always fetch from the network.
+  ///
+  /// When `true`, the loader skips the cache check and goes straight to
+  /// the network. If the network fails, it still falls back to cache/assets.
+  ///
+  /// Defaults to `false`.
+  final bool forceRefresh;
+
+  /// An optional callback invoked after translations are loaded.
+  ///
+  /// Receives the locale name and the [TranslationSource] indicating where
+  /// the translations were loaded from. Useful for debugging and analytics.
+  final void Function(String locale, TranslationSource source)?
+  onSourceResolved;
+
   /// Creates a new [NetworkOrAssetLoader].
   ///
   /// The [localeUrl] and [assetsPath] parameters are required.
@@ -82,6 +122,9 @@ class NetworkOrAssetLoader extends AssetLoader {
     this.timeout = const Duration(seconds: 30),
     required this.assetsPath,
     this.localCacheDuration = const Duration(days: 1),
+    this.httpClient,
+    this.forceRefresh = false,
+    this.onSourceResolved,
   });
 
   /// Loads translation data for the specified locale.
@@ -96,30 +139,43 @@ class NetworkOrAssetLoader extends AssetLoader {
   @override
   Future<Map<String, dynamic>> load(String path, Locale locale) async {
     var string = '';
+    var source = TranslationSource.asset;
 
-    // try loading local previously-saved localization file
-    if (await localTranslationExists(locale.toString())) {
+    // try loading local previously-saved localization file (if not forcing refresh)
+    if (!forceRefresh &&
+        await localTranslationExists(
+          locale.toString(),
+          checkCacheDuration: true,
+        )) {
       string = await loadFromLocalFile(locale.toString());
+      source = TranslationSource.cache;
     }
 
     // no local or failed, check if internet and download the file
     if (string == '' && await isInternetConnectionAvailable()) {
       string = await loadFromNetwork(locale.toString());
+      if (string != '') {
+        source = TranslationSource.network;
+      }
     }
 
-    // local cache duration was reached or no internet access but prefer local file to assets
+    // no internet access or network failed — use expired cache if available
     if (string == '' &&
         await localTranslationExists(
           locale.toString(),
-          ignoreCacheDuration: false,
+          checkCacheDuration: false,
         )) {
       string = await loadFromLocalFile(locale.toString());
+      source = TranslationSource.expiredCache;
     }
 
     // still nothing? Load from assets
     if (string == '') {
       string = await rootBundle.loadString('$assetsPath/$locale.json');
+      source = TranslationSource.asset;
     }
+
+    onSourceResolved?.call(locale.toString(), source);
 
     // then returns the json file
     return json.decode(string);
@@ -148,12 +204,11 @@ class NetworkOrAssetLoader extends AssetLoader {
   /// Returns an empty string if the download fails or times out.
   Future<String> loadFromNetwork(String localeName) async {
     String url = localeUrl(localeName);
+    final client = httpClient ?? http.Client();
+    final shouldCloseClient = httpClient == null;
     try {
-      final response = await Future.any([
-        http.get(Uri.parse(url)),
-        Future.delayed(timeout),
-      ]);
-      if (response != null && response.statusCode == 200) {
+      final response = await client.get(Uri.parse(url)).timeout(timeout);
+      if (response.statusCode == 200) {
         var content = utf8.decode(response.bodyBytes);
         // check valid json before saving it
         if (json.decode(content) != null) {
@@ -161,8 +216,14 @@ class NetworkOrAssetLoader extends AssetLoader {
           return content;
         }
       }
+    } on TimeoutException {
+      // network request timed out — fall through to return empty
     } catch (e) {
-      //donothing
+      // network error — fall through to return empty
+    } finally {
+      if (shouldCloseClient) {
+        client.close();
+      }
     }
 
     return '';
@@ -170,22 +231,22 @@ class NetworkOrAssetLoader extends AssetLoader {
 
   /// Checks if a locally cached translation exists for the given locale.
   ///
-  /// By default, this method checks if the cached file exists and if it's still
-  /// within the [localCacheDuration]. Set [ignoreCacheDuration] to `true` to
-  /// only check file existence without considering its age.
+  /// When [checkCacheDuration] is `true`, the method also checks whether the
+  /// cached file is still within the [localCacheDuration]. When `false`, only
+  /// file existence is checked regardless of age.
   ///
   /// Returns `true` if a valid cached file exists, `false` otherwise.
   Future<bool> localTranslationExists(
     String localeName, {
-    bool ignoreCacheDuration = false,
+    bool checkCacheDuration = true,
   }) async {
     var translationFile = await getFileForLocale(localeName);
 
     if (!await translationFile.exists()) {
       return false;
     }
-    // don't check file's age
-    if (!ignoreCacheDuration) {
+    // check file's age only when requested
+    if (checkCacheDuration) {
       var difference = DateTime.now().difference(
         await translationFile.lastModified(),
       );
@@ -212,21 +273,22 @@ class NetworkOrAssetLoader extends AssetLoader {
   Future<void> saveTranslation(String localeName, String content) async {
     var file = File(await getFilenameForLocale(localeName));
     await file.create(recursive: true);
+    await file.writeAsString(content);
   }
 
   /// Returns the local path where cached translations are stored.
   ///
-  /// Uses the temporary directory provided by the system.
+  /// Uses the application support directory for persistent caching.
   Future<String> get _localPath async {
-    final directory = await paths.getTemporaryDirectory();
+    final directory = await paths.getApplicationSupportDirectory();
 
     return directory.path;
   }
 
   /// Returns the full file path for a cached translation file.
   ///
-  /// The file is stored in a `translations-res` subdirectory of the temporary
-  /// directory with the locale name as the filename.
+  /// The file is stored in a `translations-res` subdirectory of the
+  /// application support directory with the locale name as the filename.
   Future<String> getFilenameForLocale(String localeName) async {
     return '${await _localPath}/translations-res/$localeName.json';
   }
